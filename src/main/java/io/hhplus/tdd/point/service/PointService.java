@@ -7,6 +7,8 @@ import io.hhplus.tdd.point.Entity.UserPoint;
 import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.service.manager.PointHistoryManager;
 import io.hhplus.tdd.point.service.manager.PointManager;
+import io.hhplus.tdd.point.service.reader.PointHistoryReader;
+import io.hhplus.tdd.point.service.reader.PointReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,17 +18,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PointService {
 
-    private final UserPointTable userPointTable;
-    private final PointHistoryTable pointHistoryTable;
     private final PointManager pointManager;
     private final PointHistoryManager pointHistoryManager;
+    private final PointReader pointReader;
+    private final PointHistoryReader pointHistoryReader;
 
     public UserPoint getUserPoint(long id) {
-        return userPointTable.selectById(id);
+        return pointReader.read(id);
     }
 
     public List<PointHistory> getPointHistories(long id) {
-        return pointHistoryTable.selectAllByUserId(id);
+        return pointHistoryReader.read(id);
     }
 
     public UserPoint charge(long id, long amount) {

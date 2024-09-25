@@ -8,6 +8,8 @@ import io.hhplus.tdd.point.exception.PointException;
 import io.hhplus.tdd.point.service.PointService;
 import io.hhplus.tdd.point.service.manager.PointHistoryManager;
 import io.hhplus.tdd.point.service.manager.PointManager;
+import io.hhplus.tdd.point.service.reader.PointHistoryReader;
+import io.hhplus.tdd.point.service.reader.PointReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +34,14 @@ class PointServiceTest {
     private PointHistoryTable pointHistoryTable;
 
     @Mock
+    private PointReader pointReader;
+
+    @Mock
+    private PointHistoryReader pointHistoryReader;
+
+    @Mock
     private PointManager pointManager;
+
 
     @Mock
     private PointHistoryManager pointHistoryManager;
@@ -49,14 +58,14 @@ class PointServiceTest {
         // Given
         long userId = 1L;
         UserPoint expectedUserPoint = new UserPoint(userId, 1000L, System.currentTimeMillis());
-        when(userPointTable.selectById(userId)).thenReturn(expectedUserPoint);
+        when(pointReader.read(userId)).thenReturn(expectedUserPoint);
 
         // When
         UserPoint result = pointService.getUserPoint(userId);
 
         // Then
         assertEquals(expectedUserPoint, result);
-        verify(userPointTable, times(1)).selectById(userId);
+        verify(pointReader, times(1)).read(userId);
     }
 
     @Test
@@ -65,14 +74,14 @@ class PointServiceTest {
         // Given
         long userId = 2L;
         UserPoint emptyUserPoint = UserPoint.empty(userId);
-        when(userPointTable.selectById(userId)).thenReturn(emptyUserPoint);
+        when(pointReader.read(userId)).thenReturn(emptyUserPoint);
 
         // When
         UserPoint result = pointService.getUserPoint(userId);
 
         // Then
         assertEquals(emptyUserPoint, result);
-        verify(userPointTable, times(1)).selectById(userId);
+        verify(pointReader, times(1)).read(userId);
     }
 
     @Test
@@ -86,14 +95,14 @@ class PointServiceTest {
                 new PointHistory(1L, userId, chargeAmount, TransactionType.CHARGE, System.currentTimeMillis()),
                 new PointHistory(2L, userId, useAmount, TransactionType.USE, System.currentTimeMillis())
         );
-        when(pointHistoryTable.selectAllByUserId(userId)).thenReturn(expectedPointHistories);
+        when(pointHistoryReader.read(userId)).thenReturn(expectedPointHistories);
 
         //when
         List<PointHistory> result = pointService.getPointHistories(userId);
 
         //then
         assertEquals(expectedPointHistories, result);
-        verify(pointHistoryTable, times(1)).selectAllByUserId(userId);
+        verify(pointHistoryReader, times(1)).read(userId);
 
     }
 
@@ -103,13 +112,13 @@ class PointServiceTest {
         //Given
         long userId = 1L;
         List<PointHistory> expectedPointHistories = List.of();
-        when(pointHistoryTable.selectAllByUserId(userId)).thenReturn(expectedPointHistories);
+        when(pointHistoryReader.read(userId)).thenReturn(expectedPointHistories);
 
         //when
         List<PointHistory> result = pointService.getPointHistories(userId);
 
         //then
-        verify(pointHistoryTable, times(1)).selectAllByUserId(userId);
+        verify(pointHistoryReader, times(1)).read(userId);
 
         assertEquals(expectedPointHistories, result);
 
