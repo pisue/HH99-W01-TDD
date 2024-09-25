@@ -112,15 +112,17 @@ class PointServiceTest {
         //Given
         long userId = 1L;
         List<PointHistory> expectedPointHistories = List.of();
-        when(pointHistoryReader.read(userId)).thenReturn(expectedPointHistories);
+        when(pointService.getPointHistories(userId)).thenReturn(expectedPointHistories);
+        when(pointHistoryReader.read(userId)).thenThrow(new PointException("포인트 내역이 존재하지 않습니다."));
 
         //when
-        List<PointHistory> result = pointService.getPointHistories(userId);
+        PointException exception = assertThrows(PointException.class, () -> pointService.getPointHistories(userId));
+
 
         //then
         verify(pointHistoryReader, times(1)).read(userId);
 
-        assertEquals(expectedPointHistories, result);
+        assertEquals("포인트 내역이 존재하지 않습니다.", exception.getMessage());
 
     }
 
@@ -135,14 +137,14 @@ class PointServiceTest {
         long updateAmount = amount + existAmount;
 
         UserPoint expectedUserPoint = new UserPoint(userId, updateAmount, System.currentTimeMillis());
-        when(userPointTable.selectById(userId)).thenReturn(existUserPoint);
-        when(userPointTable.insertOrUpdate(userId, updateAmount)).thenReturn(expectedUserPoint);
+        when(pointReader.read(userId)).thenReturn(existUserPoint);
+        when(pointManager.charge(userId, updateAmount)).thenReturn(expectedUserPoint);
 
         //when
         UserPoint result = pointService.charge(userId, amount);
 
         //then
-        verify(userPointTable, times(1)).insertOrUpdate(userId, updateAmount);
+        verify(pointManager, times(1)).charge(userId, updateAmount);
         assertEquals(expectedUserPoint, result);
 
     }
