@@ -186,4 +186,7 @@ class PointServiceTest {
         //then
         assertEquals("사용할 포인트가 부족합니다.", exception.getMessage());
     }
+
+    /*@Test
+    @DisplayName("amont가 음수로 들어왔을 때")*/
 }
