@@ -11,13 +11,18 @@ import org.springframework.stereotype.Component;
 public class PointManager {
     private final UserPointTable userPointTable;
 
-    public UserPoint charge(Long id, Long amount) {
+    public UserPoint charge(long id, long amount) {
         UserPoint existingUserPoint = userPointTable.selectById(id);
         if (amount <= 0) {
             throw new PointException("적립할 포인트는 0보다 커야 합니다.");
         }
+
+        long chargeAmount = existingUserPoint.point() + amount;
+        if (chargeAmount > 99999) {
+            throw new PointException("최대 잔고는 99999를 넘을 수 없습니다.");
+        }
         //업데이트
-        return userPointTable.insertOrUpdate(id, existingUserPoint.point() + amount);
+        return userPointTable.insertOrUpdate(id, chargeAmount);
     }
 
     public UserPoint use(long id, long amount) {
